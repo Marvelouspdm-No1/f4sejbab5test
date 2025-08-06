@@ -84,13 +84,6 @@
         .save-btn:hover {
             background-color: #0b7dda;
         }
-        .whatsapp-btn {
-            background-color: #25D366;
-            margin: 5px;
-        }
-        .whatsapp-btn:hover {
-            background-color: #1da851;
-        }
         .download-btn {
             background-color: #FF6B35;
             margin: 5px;
@@ -111,16 +104,82 @@
         }
         label {
             display: block;
-            margin: 5px 0;
+            margin: 8px 0;
             cursor: pointer;
-            padding: 5px;
-            border-radius: 3px;
+            padding: 15px 12px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            background-color: #fff;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            line-height: 1.4;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
         }
         label:hover {
-            background-color: #f0f0f0;
+            background-color: #f5f5f5;
+            border-color: #2196F3;
+        }
+        label:active {
+            background-color: #e3f2fd;
         }
         input[type="radio"] {
-            margin-right: 8px;
+            margin-right: 12px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        input[type="radio"]:checked + span {
+            font-weight: bold;
+            color: #2196F3;
+        }
+        label.selected {
+            background-color: #e3f2fd;
+            border-color: #2196F3;
+            font-weight: bold;
+        }
+        
+        /* 移动端优化 */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+                font-size: 16px;
+            }
+            .question {
+                padding: 20px 15px;
+                margin-bottom: 15px;
+            }
+            label {
+                padding: 18px 15px;
+                font-size: 17px;
+                min-height: 60px;
+            }
+            input[type="radio"] {
+                width: 22px;
+                height: 22px;
+                margin-right: 15px;
+            }
+            button {
+                padding: 15px 25px;
+                font-size: 17px;
+                margin: 8px 5px;
+                width: 100%;
+                max-width: 300px;
+            }
+            h2 {
+                font-size: 20px;
+                line-height: 1.3;
+            }
+            .info-box {
+                padding: 15px 12px;
+                font-size: 15px;
+            }
+            .tab {
+                padding: 12px 15px;
+                font-size: 16px;
+            }
         }
         .info-box {
             background: #e6f3ff;
@@ -136,10 +195,10 @@
 <h2>F4 Sejarah Bab 5 Quiz - Persekutuan Tanah Melayu 1948</h2>
 <div class="info-box">
     <p><strong>💡 温馨提示：</strong></p>
-    <p>• 📱 <strong>发送成绩给老师</strong> - 直接发送到老师WhatsApp (+60127317286)</p>
-    <p>• 🖼️ <strong>生成成绩单图片</strong> - 制作正式的成绩单图片，可下载后发送给老师</p>
-    <p>• 💾 图片格式的成绩单更正式，包含详细的错题分析，适合向老师汇报</p>
+    <p>• 🖼️ <strong>生成成绩单图片</strong> - 制作正式的成绩单图片，可保存和分享</p>
+    <p>• 💾 <strong>保存进度功能</strong> - 可以随时保存测验进度，稍后继续作答</p>
     <p>• 📚 本测验涵盖Persekutuan Tanah Melayu 1948的重要知识点</p>
+    <p>• 📱 手机端已优化，选项按钮更大更容易点击</p>
 </div>
 
 <div class="tabs">
@@ -382,8 +441,7 @@ function displayResults(name, form, score, results, unanswered) {
         ${unanswered > 0 ? `<p>注意：你有 ${unanswered} 题没有作答</p>` : ''}
         <p>${getFeedback(score)}</p>
         <div class="save-buttons">
-            <button class="whatsapp-btn" onclick="sendToWhatsApp('${name}', '${form}', ${score}, ${unanswered}, 'teacher')">📱 发送成绩给老师</button>
-            <button class="whatsapp-btn" onclick="generateReportImage('${name}', '${form}', ${score}, ${unanswered})">🖼️ 生成成绩单图片</button>
+            <button class="download-btn" onclick="generateReportImage('${name}', '${form}', ${score}, ${unanswered})">🖼️ 生成成绩单图片</button>
         </div>
         <div id="reportCanvas" style="margin-top: 20px;"></div>
         <hr>
@@ -425,56 +483,12 @@ function getFeedback(score) {
     }
 }
 
-function sendToWhatsApp(name, form, score, unanswered, recipient = 'teacher') {
-    const date = new Date().toLocaleString();
-    const percentage = Math.round((score / 20) * 100);
-    const grade = getGrade(score);
-    
-    let message = '';
-    let whatsappUrl = '';
-    
-    if (recipient === 'teacher') {
-        message += `尊敬的老师，您好！\n\n`;
-        message += `我是 ${name} (${form})，刚完成了F4 Sejarah Bab 5 - Persekutuan Tanah Melayu 1948测验，现向您汇报成绩：\n\n`;
-        message += `📊 测验成绩: ${score}/20 分 (${percentage}%)\n`;
-        message += `⭐ 等级: ${grade}\n`;
-        message += `📅 测验时间: ${date}\n`;
-        if (unanswered > 0) {
-            message += `⚠️ 未完成题目: ${unanswered} 题\n`;
-        }
-        message += `\n🎯 掌握程度: ${getSkillLevel(score)}\n`;
-        message += `\n我会继续努力学习马来亚历史，谢谢老师的指导！`;
-        
-        // Encode the message for URL
-        const encodedMessage = encodeURIComponent(message);
-        
-        // Create WhatsApp URL with specific teacher phone number
-        whatsappUrl = `https://wa.me/60127317286?text=${encodedMessage}`;
-        
-    } else {
-        // General message (fallback)
-        message += `📚 F4 Sejarah Bab 5 Quiz 成绩报告\n\n`;
-        message += `👤 姓名: ${name}\n`;
-        message += `🎓 年级: ${form}\n`;
-        message += `📅 测验日期: ${date}\n`;
-        message += `📊 得分: ${score}/20 (${percentage}%)\n`;
-        message += `⭐ 等级: ${grade}\n`;
-        if (unanswered > 0) {
-            message += `⚠️ 未作答题目: ${unanswered} 题\n`;
-        }
-        message += `\n📝 评语: ${getFeedback(score)}\n`;
-        message += `\n🎯 历史知识掌握程度: ${getSkillLevel(score)}\n`;
-        message += `\n💪 继续加油，学好马来亚历史！`;
-        
-        // Encode the message for URL
-        const encodedMessage = encodeURIComponent(message);
-        
-        // Create general WhatsApp URL
-        whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
-    }
-    
-    // Open WhatsApp
-    window.open(whatsappUrl, '_blank');
+// 日期格式化函数：DD/MM/YYYY
+function formatDate(date) {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
 }
 
 function generateReportImage(name, form, score, unanswered) {
@@ -532,7 +546,7 @@ function generateReportImage(name, form, score, unanswered) {
     ctx.font = '20px Arial';
     ctx.fillText(`姓名 Name: ${name}`, 50, 210);
     ctx.fillText(`年级 Form: ${form}`, 50, 240);
-    ctx.fillText(`测验日期 Date: ${new Date().toLocaleDateString()}`, 50, 270);
+    ctx.fillText(`测验日期 Date: ${formatDate(new Date())}`, 50, 270);
     
     // Score Section
     const percentage = Math.round((score / 20) * 100);
@@ -628,10 +642,10 @@ function generateReportImage(name, form, score, unanswered) {
             <canvas id="generatedCanvas" width="800" height="${canvas.height}" style="max-width: 100%; height: auto; border: 1px solid #ddd;"></canvas>
             <div style="margin-top: 15px;">
                 <button class="download-btn" onclick="downloadReportImage()">💾 下载图片</button>
-                <button class="whatsapp-btn" onclick="shareReportImage()">📱 发送给老师</button>
+                <button class="save-btn" onclick="shareReportImage()">📤 分享图片</button>
             </div>
             <p style="color: #666; font-size: 14px; margin-top: 10px;">
-                💡 提示：点击"下载图片"保存到设备，或点击"发送给老师"直接通过WhatsApp发送
+                💡 提示：点击"下载图片"保存到设备，或点击"分享图片"通过其他应用分享
             </p>
         </div>
     `;
@@ -651,8 +665,10 @@ function generateReportImage(name, form, score, unanswered) {
 
 function downloadReportImage() {
     if (window.reportCanvas) {
+        const today = new Date();
+        const dateStr = formatDate(today).replace(/\//g, '-'); // 替换/为-用于文件名
         const link = document.createElement('a');
-        link.download = `F4_Sejarah_Bab5_成绩单_${new Date().toISOString().split('T')[0]}.png`;
+        link.download = `F4_Sejarah_Bab5_成绩单_${dateStr}.png`;
         link.href = window.reportCanvas.toDataURL();
         link.click();
     }
@@ -674,10 +690,9 @@ function shareReportImage() {
             });
         });
     } else {
-        // Fallback: open WhatsApp with instruction to teacher
-        const message = encodeURIComponent('老师您好！我刚生成了F4 Sejarah Bab 5测验成绩单图片，请查看我发送的图片 📋✨');
-        window.open(`https://wa.me/60127317286?text=${message}`, '_blank');
-        alert('请手动下载图片，然后在WhatsApp中发送给老师 📱');
+        // Fallback: just download the image
+        downloadReportImage();
+        alert('成绩单图片已下载到您的设备 📱');
     }
 }
 
@@ -731,7 +746,6 @@ function loadHistory() {
                 <p>得分: <strong>${attempt.score} / 20</strong></p>
                 <button onclick="viewAttemptDetails(${index})">查看详情</button>
                 <div style="margin-top: 10px;">
-                    <button class="whatsapp-btn" onclick="sendHistoryToWhatsApp(${index}, 'teacher')" style="font-size: 12px; padding: 8px 12px;">📱 发送成绩给老师</button>
                     <button class="download-btn" onclick="generateHistoryReportImage(${index})" style="font-size: 12px; padding: 8px 12px;">🖼️ 生成成绩单图片</button>
                 </div>
                 <div id="attemptDetails${index}" style="display: none; margin-top: 10px;">
@@ -751,96 +765,6 @@ function loadHistory() {
     });
     
     historyList.innerHTML = html;
-}
-
-function sendHistoryToWhatsApp(attemptIndex, recipient = 'teacher') {
-    const attempts = JSON.parse(localStorage.getItem('sejarahBab5QuizAttempts') || '[]');
-    const attempt = attempts[attemptIndex];
-    
-    if (!attempt) {
-        alert("找不到该测验记录！");
-        return;
-    }
-    
-    const percentage = Math.round((attempt.score / 20) * 100);
-    const grade = getGrade(attempt.score);
-    const unanswered = attempt.results.filter(r => r.selected === "未作答").length;
-    
-    let message = '';
-    let whatsappUrl = '';
-    
-    if (recipient === 'teacher') {
-        message += `尊敬的老师，您好！\n\n`;
-        message += `我是 ${attempt.name} (${attempt.form})，向您汇报F4 Sejarah Bab 5测验成绩：\n\n`;
-        message += `📊 测验成绩: ${attempt.score}/20 分 (${percentage}%)\n`;
-        message += `⭐ 等级: ${grade}\n`;
-        message += `📅 测验时间: ${attempt.date}\n`;
-        if (unanswered > 0) {
-            message += `⚠️ 未完成题目: ${unanswered} 题\n`;
-        }
-        message += `\n🎯 掌握程度: ${getSkillLevel(attempt.score)}\n`;
-        
-        // Add wrong answers for teacher
-        const wrongAnswers = attempt.results.filter(r => !r.isCorrect);
-        if (wrongAnswers.length > 0) {
-            message += `\n❌ 需要加强的知识点:\n`;
-            wrongAnswers.slice(0, 3).forEach((r, index) => {
-                const qNum = attempt.results.indexOf(r) + 1;
-                message += `${index + 1}. 第${qNum}题: 选择了"${r.selected}"，正确答案是"${r.correct}"\n`;
-            });
-            if (wrongAnswers.length > 3) {
-                message += `... 还有 ${wrongAnswers.length - 3} 道需要复习\n`;
-            }
-        }
-        
-        message += `\n我会针对错题进行复习，谢谢老师的指导！`;
-        
-        // Encode the message for URL
-        const encodedMessage = encodeURIComponent(message);
-        
-        // Create WhatsApp URL with specific teacher phone number
-        whatsappUrl = `https://wa.me/60127317286?text=${encodedMessage}`;
-        
-    } else {
-        // General message
-        message += `📚 F4 Sejarah Bab 5 Quiz 成绩报告\n\n`;
-        message += `👤 姓名: ${attempt.name}\n`;
-        message += `🎓 年级: ${attempt.form}\n`;
-        message += `📅 测验日期: ${attempt.date}\n`;
-        message += `📊 得分: ${attempt.score}/20 (${percentage}%)\n`;
-        message += `⭐ 等级: ${grade}\n`;
-        
-        if (unanswered > 0) {
-            message += `⚠️ 未作答题目: ${unanswered} 题\n`;
-        }
-        
-        message += `\n📝 评语: ${getFeedback(attempt.score)}\n`;
-        message += `\n🎯 历史知识掌握程度: ${getSkillLevel(attempt.score)}\n`;
-        
-        // Add wrong answers details
-        const wrongAnswers = attempt.results.filter(r => !r.isCorrect);
-        if (wrongAnswers.length > 0) {
-            message += `\n❌ 错题分析:\n`;
-            wrongAnswers.slice(0, 3).forEach((r, index) => {
-                const qNum = attempt.results.indexOf(r) + 1;
-                message += `${index + 1}. 第${qNum}题: ${r.selected} → ${r.correct}\n`;
-            });
-            if (wrongAnswers.length > 3) {
-                message += `... 还有 ${wrongAnswers.length - 3} 道错题\n`;
-            }
-        }
-        
-        message += `\n💪 继续加油，学好马来亚历史！`;
-        
-        // Encode the message for URL
-        const encodedMessage = encodeURIComponent(message);
-        
-        // Create general WhatsApp URL
-        whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
-    }
-    
-    // Open WhatsApp
-    window.open(whatsappUrl, '_blank');
 }
 
 function generateHistoryReportImage(attemptIndex) {
@@ -896,10 +820,19 @@ function generateHistoryReportImage(attemptIndex) {
     ctx.textAlign = 'left';
     ctx.fillText('学生信息 Student Information', 50, 170);
     
+    // 格式化历史记录中的日期
+    let formattedDate;
+    try {
+        const attemptDate = new Date(attempt.date);
+        formattedDate = formatDate(attemptDate);
+    } catch (error) {
+        formattedDate = attempt.date; // 如果解析失败，使用原日期
+    }
+    
     ctx.font = '20px Arial';
     ctx.fillText(`姓名 Name: ${attempt.name}`, 50, 210);
     ctx.fillText(`年级 Form: ${attempt.form}`, 50, 240);
-    ctx.fillText(`测验日期 Date: ${attempt.date}`, 50, 270);
+    ctx.fillText(`测验日期 Date: ${formattedDate}`, 50, 270);
     
     // Score Section
     const percentage = Math.round((attempt.score / 20) * 100);
@@ -987,13 +920,21 @@ function generateHistoryReportImage(attemptIndex) {
     ctx.fillText('继续加油，学好马来亚历史！Keep studying Malaysian History!', canvas.width/2, canvas.height - 30);
     
     // Create download link
+    let downloadDateStr;
+    try {
+        const attemptDate = new Date(attempt.date);
+        downloadDateStr = formatDate(attemptDate).replace(/\//g, '-');
+    } catch (error) {
+        downloadDateStr = attempt.date.replace(/[/:]/g, '-');
+    }
+    
     const link = document.createElement('a');
-    link.download = `F4_Sejarah_Bab5_成绩单_${attempt.name}_${attempt.date.replace(/[/:]/g, '-')}.png`;
+    link.download = `F4_Sejarah_Bab5_成绩单_${attempt.name}_${downloadDateStr}.png`;
     link.href = canvas.toDataURL();
     link.click();
     
     // Also show success message
-    alert('成绩单图片已下载！您可以通过WhatsApp发送给老师 📱');
+    alert('成绩单图片已下载！您可以保存或通过其他方式分享 📱');
 }
 
 function viewAttemptDetails(index) {
@@ -1043,7 +984,14 @@ function loadProgress() {
     progress.answers.forEach((answer, index) => {
         if (answer) {
             const radio = document.querySelector(`input[name="q${index}"][value="${answer}"]`);
-            if (radio) radio.checked = true;
+            if (radio) {
+                radio.checked = true;
+                // 添加视觉选中效果
+                const label = radio.closest('label');
+                if (label) {
+                    label.classList.add('selected');
+                }
+            }
         }
     });
     
@@ -1056,10 +1004,31 @@ window.onload = function() {
         const div = document.createElement('div');
         div.className = "question";
         div.innerHTML = `<p><strong>第${index + 1}题.</strong> ${q.q}</p>` +
-                        q.options.map(opt => `
-                            <label><input type="radio" name="q${index}" value="${opt}"> ${opt}</label><br>
+                        q.options.map((opt, optIndex) => `
+                            <label onclick="selectOption(this, ${index}, ${optIndex})">
+                                <input type="radio" name="q${index}" value="${opt}">
+                                <span>${opt}</span>
+                            </label>
                         `).join('');
         qDiv.appendChild(div);
+        
+        // 添加radio button change事件监听器
+        div.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                if (this.checked) {
+                    // 清除同一题目其他选项的selected样式
+                    const questionDiv = this.closest('.question');
+                    const allLabels = questionDiv.querySelectorAll('label');
+                    allLabels.forEach(label => label.classList.remove('selected'));
+                    
+                    // 给当前选择的选项添加selected样式
+                    const currentLabel = this.closest('label');
+                    if (currentLabel) {
+                        currentLabel.classList.add('selected');
+                    }
+                }
+            });
+        });
     });
     
     // Check if there's saved progress
@@ -1068,6 +1037,24 @@ window.onload = function() {
             loadProgress();
         }
     }
+}
+
+// 添加选项选择函数，提供更好的视觉反馈
+function selectOption(labelElement, questionIndex, optionIndex) {
+    // 清除同一题目的其他选项的selected样式
+    const questionDiv = labelElement.closest('.question');
+    const allLabels = questionDiv.querySelectorAll('label');
+    allLabels.forEach(label => label.classList.remove('selected'));
+    
+    // 给当前选择的选项添加selected样式
+    labelElement.classList.add('selected');
+    
+    // 确保radio button被选中
+    const radioButton = labelElement.querySelector('input[type="radio"]');
+    radioButton.checked = true;
+    
+    // 设置正确的value值
+    radioButton.value = questions[questionIndex].options[optionIndex];
 }
 </script>
 
